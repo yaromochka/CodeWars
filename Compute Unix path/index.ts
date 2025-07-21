@@ -1,28 +1,32 @@
 import { assert } from 'chai';
 
-function combinePathsUri(...args: string[]) {
-    // add magic here
+const DELETE_SPACES_REGEXP = /\\/g
+
+function combinePathsUri(...args: string[]): string {
     if (args.length === 0) {
-        return '/'
+        return '/';
     }
 
-    let pathInUnixStyle: string[] = []
+    let pathInUnixStyle = [];
 
-    for (let indexOfArg in args) {
-        let path: string = args[indexOfArg]
-
-        if (path === '') {
-            continue
+    for (let arg of args) {
+        if (arg === '') continue;
+        let cleanedPath = arg.replace(/\\/g, '/').replace(DELETE_SPACES_REGEXP, '').trim();
+        if (cleanedPath === '') continue;
+        if (pathInUnixStyle.length != 0 && !cleanedPath.startsWith('/')) {
+            cleanedPath = '/' + cleanedPath;
         }
-
-        if (path[0] !== '/') {
-            pathInUnixStyle.push('/')
-        }
-        let clearPath = path.replace(' ', '').replace('\\', '/').trim()
-        pathInUnixStyle.push(clearPath)
+        cleanedPath = cleanedPath.replace(/\/+$/g, '');
+        pathInUnixStyle.push(cleanedPath);
     }
 
-    return pathInUnixStyle.join('')
+    let resultPathInUnixStyle = pathInUnixStyle.join('')
+
+    if (!resultPathInUnixStyle.startsWith('/')) {
+        resultPathInUnixStyle = '/' + resultPathInUnixStyle;
+    }
+
+    return resultPathInUnixStyle;
 }
 
 describe("UNIX style path", () => {
@@ -34,10 +38,9 @@ describe("UNIX style path", () => {
 
     it("Backslashes and spaces", () => {
         assert.equal(combinePathsUri("   /testing", "", "", "  \\  empty", "\\parts/", " and ", "", "with/different\\slashes    "), "/testing/empty/parts/and/with/different/slashes");
-        assert.equal(combinePathsUri('test\\test/test'), 'test/test/test');
+        assert.equal(combinePathsUri('test\\test/test'), '/test/test/test');
         assert.equal(combinePathsUri('    test/test'), '/test/test');
         assert.equal(combinePathsUri('   test   ', '/test', '', '       \\test\\', 'test'), '/test/test/test/test');
         assert.equal(combinePathsUri(" .. ", "/complex/path/with/slashes/inside/", " . ", "\\complex\\path\\with\\back\\slashes\\inside\\"), "/../complex/path/with/slashes/inside/./complex/path/with/back/slashes/inside");
     });
 });
-

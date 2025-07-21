@@ -4,9 +4,11 @@ interface TodoPick {
   completed: boolean
 }
 
-type MyPick<T, K extends keyof T> = {
-    [P in K]: T[P];
+type MyPick<InputType, KeysForPicking extends keyof InputType> = {
+    [P in KeysForPicking]: InputType[P];
 }
+
+type a = keyof TodoPick
 
 type TodoPreview = MyPick<TodoPick, 'title' | 'completed'>
 
@@ -14,4 +16,3 @@ const todoPick: TodoPreview = {
     title: 'Clean room',
     completed: false,
 }
-

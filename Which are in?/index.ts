@@ -8,13 +8,10 @@ function inArray(array1: string[], array2: string[]): string[] {
 
         let firstArrayElem: string = array1[indexFirstArray]
 
-        for (let indexSecondArray in array2) {
-            let secondArrayElem: string = array2[indexSecondArray]
-            if (secondArrayElem.includes(firstArrayElem)) {
-                arrayWithSubstrings.push(firstArrayElem)
-                break;
-            }
-        }
+        let elem = array2.find((element) => {
+            element.includes(firstArrayElem)
+        })
+        elem && arrayWithSubstrings.push(elem)
     }
 
     return arrayWithSubstrings.sort()
