@@ -1,44 +1,72 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var chai_1 = require("chai");
-var SIZE_OF_CHUNK_BASE64 = 6;
+var SIZE_OF_CHUNK_BASE64_ENCODING = 6;
+var SIZE_OF_CHUNK_BASE64_DECODING = 8;
+var BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+var Base64;
+(function (Base64) {
+    Base64[Base64["ENCODING"] = 0] = "ENCODING";
+    Base64[Base64["DECODING"] = 1] = "DECODING";
+})(Base64 || (Base64 = {}));
 String.prototype.toBase64 = function () {
     var currentString = this.toString();
     var stringInBinaryArray = Array();
     for (var _i = 0, currentString_1 = currentString; _i < currentString_1.length; _i++) {
         var str = currentString_1[_i];
-        var binaryValueString = letterToBinary(str);
+        var binaryValueString = letterToBinary(str, Base64.ENCODING);
         stringInBinaryArray.push(binaryValueString);
     }
     var binaryString = stringInBinaryArray.join('');
-    var splittedStringToChunks = splitStringIntoChunk(binaryString, SIZE_OF_CHUNK_BASE64);
+    var splittedStringToChunks = splitStringIntoChunk(binaryString, SIZE_OF_CHUNK_BASE64_ENCODING);
     var resultCodingBase = Array();
     for (var _a = 0, splittedStringToChunks_1 = splittedStringToChunks; _a < splittedStringToChunks_1.length; _a++) {
         var chunk = splittedStringToChunks_1[_a];
-        console.log('Как выглядит чанк из шести символов', chunk);
-        resultCodingBase.push(binaryToLetter(chunk));
+        resultCodingBase.push(binaryToLetter(chunk, Base64.ENCODING));
     }
     return resultCodingBase.join('');
 };
 String.prototype.fromBase64 = function () {
-    return this.toString();
+    var currentString = this.toString();
+    var stringInBinaryArray = Array();
+    for (var _i = 0, currentString_2 = currentString; _i < currentString_2.length; _i++) {
+        var str = currentString_2[_i];
+        var binaryValueString = letterToBinary(str, Base64.DECODING);
+        stringInBinaryArray.push(binaryValueString);
+    }
+    var binaryString = stringInBinaryArray.join('');
+    var splittedStringToChunks = splitStringIntoChunk(binaryString, SIZE_OF_CHUNK_BASE64_DECODING);
+    var resultCodingBase = Array();
+    for (var _a = 0, splittedStringToChunks_2 = splittedStringToChunks; _a < splittedStringToChunks_2.length; _a++) {
+        var chunk = splittedStringToChunks_2[_a];
+        resultCodingBase.push(binaryToLetter(chunk, Base64.DECODING));
+    }
+    return resultCodingBase.join('');
 };
-function letterToBinary(str) {
-    var asciiValueString = str.charCodeAt(0);
-    console.log('Значение буквы в ASCII', str, '->', asciiValueString);
-    var binaryValueString = asciiValueString.toString(2).padStart(8, '0');
-    console.log('ASCII код в бинарном виде', binaryValueString);
+function letterToBinary(str, type) {
+    var asciiValueString;
+    var chunkSize;
+    if (type === Base64.ENCODING) {
+        asciiValueString = str.charCodeAt(0);
+        chunkSize = 8;
+    }
+    else {
+        asciiValueString = BASE64_CHARS.indexOf(str);
+        chunkSize = 6;
+    }
+    var binaryValueString = asciiValueString.toString(2).padStart(chunkSize, '0');
     return binaryValueString;
 }
-function binaryToLetter(str) {
+function binaryToLetter(str, type) {
+    var asciiValueString;
     var numberFromBinary = parseInt(str, 2);
-    console.log('Из бинарного чанка (6 символов) в десятичное число', numberFromBinary);
-    var asciiValueString = String.fromCharCode(numberFromBinary);
-    console.log('Десятичное число в ASCII', asciiValueString);
+    if (type === Base64.ENCODING) {
+        asciiValueString = BASE64_CHARS[numberFromBinary];
+    }
+    else {
+        asciiValueString = String.fromCharCode(numberFromBinary);
+    }
     return asciiValueString;
-}
-function addedArrayToChunks(arrayToAdded) {
-    return arrayToAdded;
 }
 function splitStringIntoChunk(stringToSplit, chunkSize) {
     var result = Array();
@@ -49,12 +77,13 @@ function splitStringIntoChunk(stringToSplit, chunkSize) {
 }
 describe('', function () {
     it('Encoding', function () {
-        console.log(String.fromCharCode(5));
         chai_1.assert.equal(''.toBase64(), ''),
-            chai_1.assert.equal('Hello World!'.toBase64(), 'SGVsbG8gV29ybGQh');
+            chai_1.assert.equal('Hello World!'.toBase64(), 'SGVsbG8gV29ybGQh'),
+            chai_1.assert.equal('this is a string!!'.toBase64(), 'dGhpcyBpcyBhIHN0cmluZyEh');
     }),
         it('Decoding', function () {
             chai_1.assert.equal(''.fromBase64(), ''),
                 chai_1.assert.equal('SGVsbG8gV29ybGQh'.fromBase64(), 'Hello World!');
+            chai_1.assert.equal('dGhpcyBpcyBhIHN0cmluZyEh'.fromBase64(), 'this is a string!!');
         });
 });
