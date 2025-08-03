@@ -19,6 +19,9 @@ function mix(s1, s2) {
         else if (count2 > count1) {
             resultArray.push("2:".concat(letter.repeat(counter2[letter])));
         }
+        else if (count2 > 3) {
+            resultArray.push("3:".concat(letter.repeat(counter2[letter])));
+        }
         else {
             resultArray.push("=:".concat(letter.repeat(counter1[letter])));
         }

@@ -1,6 +1,7 @@
 interface Todo {
   title: string
-  description: string
+  description: number
+  bool: boolean
   completed: boolean
 }
 
@@ -10,11 +11,12 @@ type MyOmit2<InputType, PropsToDelete extends keyof InputType> = {
 }
 
 type MyOmit<InputType, PropsToDelete extends keyof InputType> = {
-    [Prop in keyof InputType as Prop extends PropsToDelete ? never : Prop]: InputType[Prop]
+    [Prop in keyof InputType as Prop extends PropsToDelete ? 'banana' : Prop]: InputType[Prop]
 }
 
-type TodoPreview2 = MyOmit<Todo, 'description' | 'title'>
+type TodoPreview2 = MyOmit<Todo, 'description' | 'title' | 'bool'>
 
 const todo: TodoPreview2 = {
   completed: false,
+  banana: true
 }

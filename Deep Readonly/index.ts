@@ -14,7 +14,8 @@ type Expected = {
   readonly y: 'hey' 
 }
 
-type DeepReadonly<InputType> = {
-    readonly [K in keyof InputType]: InputType[K] extends any[] ? DeepReadonly<InputType[K]> : InputType[K]
+
+type DeepReadonly<InputType> = keyof InputType extends never ? InputType : {
+  readonly [Key in keyof InputType]: DeepReadonly<InputType[Key]>
 }
 type TodoDeepReadonly = DeepReadonly<X> // should be same as `Expected`

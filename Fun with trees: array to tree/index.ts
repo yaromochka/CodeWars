@@ -16,7 +16,10 @@ function arrayToTree(arr: number[]): TreeNode | undefined{
     let i = 1;
 
     while (i < arr.length && queue.length > 0) {
-        const currentNode = queue.shift()!;
+        const currentNode = queue.shift();
+        if (!currentNode) {
+            break
+        }
         if (i < arr.length) {
             currentNode.left = new TreeNode(arr[i++]);
             queue.push(currentNode.left);

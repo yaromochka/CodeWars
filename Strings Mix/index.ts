@@ -1,12 +1,14 @@
 import { assert } from 'chai';
 
 type Counter = { [key: string]: number };
+type Prefix = '1' | '2' | '=';
+type ResultArrayType = {};
 
 function mix(s1: string, s2: string): string {
     let counter1: Counter = countLetters(s1);
     let counter2: Counter = countLetters(s2);
 
-    let resultArray: string[] = []
+    let resultArray: ResultArrayType[] = []
 
     let letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -23,6 +25,8 @@ function mix(s1: string, s2: string): string {
             resultArray.push(`1:${letter.repeat(counter1[letter])}`);
         } else if (count2 > count1) {
             resultArray.push(`2:${letter.repeat(counter2[letter])}`)
+        } else if (count2 > 3) {
+            resultArray.push(`3:${letter.repeat(counter2[letter])}`)
         } else {
             resultArray.push(`=:${letter.repeat(counter1[letter])}`)
         }
@@ -31,11 +35,11 @@ function mix(s1: string, s2: string): string {
     return resultArray.sort((a, b) => {
         if (b.length !== a.length) return b.length - a.length;
 
-        const aPrefix = a[0];
-        const bPrefix = b[0];
+        const aPrefix: Prefix = a[0];
+        const bPrefix: Prefix = b[0];
         if (aPrefix !== bPrefix) {
-            const order: Record<'1' | '2' | '=', number> = { '1': 0, '2': 1, '=': 2 };
-            return order[aPrefix as '1' | '2' | '='] - order[bPrefix as '1' | '2' | '='];
+            const order: Record<Prefix, number> = { '1': 0, '2': 1, '=': 2 };
+            return order[aPrefix] - order[bPrefix];
         }
 
         return a.slice(2).localeCompare(b.slice(2));
